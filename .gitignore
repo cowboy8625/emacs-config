@@ -1,3 +1,9 @@
+.cache
+.dap-breakpoints
+.extension
+.git
+.gitignore
+.lsp-session-v1
 auto-save-list
 codeium
 config.el
@@ -9,11 +15,6 @@ recentf
 sessions
 tldr
 tramp
+transient
 tree-sitter
 url
-.cache
-.dap-breakpoints
-.extension
-.git
-.gitignore
-.lsp-session-v1
