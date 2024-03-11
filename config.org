@@ -5,6 +5,8 @@
 #+OPTIONS: toc:2
 
 * TABLE OF CONTENTS :toc:
+- [[#todo][TODO]]
+  - [[#like-telescope-httpsgithubcomminadconsult][like telescope: https://github.com/minad/consult]]
 - [[#important-programs-to-load-first][IMPORTANT PROGRAMS TO LOAD FIRST]]
   - [[#adding-the-scripts-directory-to-path][Adding the scripts directory to path]]
   - [[#sourcing-the-scripts][Sourcing the scripts]]
@@ -33,6 +35,7 @@
 - [[#minibuffer-escape][MINIBUFFER ESCAPE]]
 - [[#modeline][MODELINE]]
 - [[#neotree][NEOTREE]]
+- [[#orderless][ORDERLESS]]
 - [[#org-mode][ORG MODE]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-bullets][Enabling Org Bullets]]
@@ -55,6 +58,9 @@
 - [[#which-key][WHICH-KEY]]
 - [[#exwm][EXWM]]
 - [[#codeium][Codeium]]
+
+* TODO
+** like telescope: https://github.com/minad/consult
 
 * IMPORTANT PROGRAMS TO LOAD FIRST
 To keep this =config.org= a reasonable length, I have moved a lot of code to individual scripts that will be sourced by this config.  These scripts are found in "~/.config/emacs/scripts" and do not contain any code that most people are likely to need to edit.
@@ -533,20 +539,20 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 [[https://magit.vc/manual/][Magit]] is a full-featured git client for Emacs.
 
 #+begin_src emacs-lisp
-;; (use-package magit)
-;; (defun +elpaca-unload-seq (e)
-;;   (and (featurep 'seq) (unload-feature 'seq t))
-;;   (elpaca--continue-build e))
-;; 
-;; (defun +elpaca-seq-build-steps ()
-;;   (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
-;;                        elpaca--pre-built-steps elpaca-build-steps))
-;;           (list '+elpaca-unload-seq 'elpaca--activate-package)))
-;; 
-;; (use-package seq :ensure `(seq :build ,(+elpaca-seq-build-steps)))
-;; (use-package magit 
-;;   :after seq
-;;   :ensure t)
+(use-package magit)
+(defun +elpaca-unload-seq (e)
+  (and (featurep 'seq) (unload-feature 'seq t))
+  (elpaca--continue-build e))
+
+(defun +elpaca-seq-build-steps ()
+  (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+                       elpaca--pre-built-steps elpaca-build-steps))
+          (list '+elpaca-unload-seq 'elpaca--activate-package)))
+
+(use-package seq :ensure `(seq :build ,(+elpaca-seq-build-steps)))
+(use-package magit 
+  :after seq
+  :ensure t)
 #+end_src
 
 * HIGHLIGHT TODO
@@ -615,49 +621,80 @@ Adding highlights to TODO and related words.
 Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM, AWK, C, C++, Fortran, Icon, IDL (CORBA), IDLWAVE, Java, Javascript, M4, Makefiles, Metafont, Modula2, Object Pascal, Objective-C, Octave, Pascal, Perl, Pike, PostScript, Prolog, Python, Ruby, Simula, SQL, Tcl, Verilog, and VHDL.  Other languages will require you to install additional modes.
 
 #+begin_src emacs-lisp
-(use-package dap-mode)
 (use-package treesit-auto
   :custom
     (treesit-auto-install 'prompt)
   :config
     (treesit-auto-add-to-auto-mode-alist 'all)
     (global-treesit-auto-mode))
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (tsx-ts-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+;; (use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+end_src
 
 ** Rust Language
-#+begin_src emacs-lisp
-(use-package flycheck-rust)
-(add-hook 'rust-ts-mode-hook 'eglot-ensure)
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-#+end_src
+# #+begin_src emacs-lisp
+# (use-package flycheck-rust)
+# (add-hook 'rust-ts-mode-hook 'eglot-ensure)
+# (with-eval-after-load 'rust-mode
+#   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+# #+end_src
 
 ** GO Languge
-#+begin_src emacs-lisp
+# #+begin_src emacs-lisp
 
-(add-hook 'go-ts-mode-hook 'eglot-ensure)
+# (add-hook 'go-ts-mode-hook 'eglot-ensure)
 
-(require 'project)
+# (require 'project)
 
-(defun project-find-go-module (dir)
-  (when-let ((root (locate-dominating-file dir "go.mod")))
-    (cons 'go-module root)))
+# (defun project-find-go-module (dir)
+#   (when-let ((root (locate-dominating-file dir "go.mod")))
+#     (cons 'go-module root)))
 
-(cl-defmethod project-root ((project (head go-module)))
-  (cdr project))
+# (cl-defmethod project-root ((project (head go-module)))
+#   (cdr project))
 
-(add-hook 'project-find-functions #'project-find-go-module)
-#+end_src
+# (add-hook 'project-find-functions #'project-find-go-module)
+# #+end_src
 
 ** TypeScript Language
 #+begin_src emacs-lisp
-(defun my-typescript-ts-mode-hook ()
-  "Function to be run when entering typescript-ts-mode."
-  (require 'dap-node)
-  (dap-node-setup))
+(defun try-load-debug-file ()
+  (interactive)
+  (let ((debugger-file (expand-file-name "debug.el" default-directory)))
+	(when (file-exists-p debugger-file)
+	(message "%s" (file-exists-p debugger-file))
+	(load-file debugger-file))))
 
-(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
-(add-hook 'typescript-ts-mode-hook 'my-typescript-ts-mode-hook)
+(defun custom-typescript-ts-mode-hook ()
+"Function to be run when entering typescript-ts-mode."
+(require 'dap-node)
+(lsp)
+(dap-node-setup)
+(try-load-debug-file))
+
+(mapc (lambda (mode) (add-hook mode 'custom-typescript-ts-mode-hook))
+'(typescript-ts-mode-hook tsx-ts-mode-hook js-ts-mode-hook))
 #+end_src
 
 * MINIBUFFER ESCAPE
@@ -708,8 +745,16 @@ Neotree is a file tree viewer.  When you open neotree, it jumps to the current f
                  (setq word-wrap nil)
                  (make-local-variable 'auto-hscroll-mode)
                  (setq auto-hscroll-mode nil)))))
-
 #+end_src
+
+* ORDERLESS
+# #+begin_src emacs-lisp
+# (use-package orderless
+#   :ensure t
+#   :custom
+#   (completion-styles '(orderless basic))
+#   (completion-category-overrides '((file (styles basic partial-completion)))))
+# #+end_src
 
 * ORG MODE
 ** Enabling Table of Contents
@@ -848,7 +893,7 @@ The following settings are simple modes that are enabled (or disabled) so that E
 (setq org-edit-src-content-indentation 0) ;; Set src block automatic indent to 0 instead of 2.
 (setq ring-bell-function 'ignore) ; Turn off the annoying ringing when a key press is not valid
 (setq backup-directory-alist
-  '((".*" . "/tmp/"))) ;; stops trashing up the place like annoying friend with no respect
+  '(("." . "/tmp/"))) ;; stops trashing up the place like annoying friend with no respect
 #+end_src
 
 * SHELLS AND TERMINALS
@@ -979,7 +1024,8 @@ With Emacs version 29, true transparency has been added.  I have turned transpar
 	  which-key-idle-delay 0.8
 	  which-key-max-description-length 25
 	  which-key-allow-imprecise-window-fit nil
-	  which-key-separator " → " ))
+	  which-key-separator " → " )
+    (which-key-mode))
 #+end_src
 
 * EXWM
