@@ -59,7 +59,8 @@
 - [[#tldr][TLDR]]
 - [[#transparency][TRANSPARENCY]]
 - [[#which-key][WHICH-KEY]]
-- [[#exwm][EXWM]]
+- [[#window-management][WINDOW MANAGEMENT]]
+  - [[#exwm][EXWM]]
 - [[#codeium][Codeium]]
 
 * TODO
@@ -674,12 +675,20 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+end_src
 
 ** Rust Language
-# #+begin_src emacs-lisp
-# (use-package flycheck-rust)
-# (add-hook 'rust-ts-mode-hook 'eglot-ensure)
-# (with-eval-after-load 'rust-mode
-#   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-# #+end_src
+#+begin_src emacs-lisp
+(use-package flycheck-rust)
+(add-hook 'rust-ts-mode-hook 'lsp)
+(with-eval-after-load 'rust-mode
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+;; (dap-register-debug-template "Rust::GDB Run Configuration"
+;;                              (list :type "gdb"
+;;                                    :request "launch"
+;;                                    :name "GDB::Run"
+;;                            :gdbpath "rust-gdb"
+;;                                    :target nil
+;;                                    :cwd nil))
+
+#+end_src
 
 ** GO Languge
 # #+begin_src emacs-lisp
@@ -1050,7 +1059,8 @@ With Emacs version 29, true transparency has been added.  I have turned transpar
     (which-key-mode))
 #+end_src
 
-* EXWM
+* WINDOW MANAGEMENT
+** EXWM
 #+begin_src emacs-lisp
 ;; (use-package exwm)
 ;; (use-package exwm-config)
