@@ -5,6 +5,7 @@
 .gitignore
 .lsp-session-v1
 auto-save-list
+bookmarks
 codeium
 config.el
 elpa

@@ -109,13 +109,19 @@ By default, Emacs creates automatic backups of files in their original directori
 
 ** IRC
 #+begin_src emacs-lisp
+
+;; You can put your credentials in a .authinfo file and it can use those. You can also gpg encrypt it (as .authinfo.gpg).
+;; * mretka is working with Java today and is grateful that asdf exists 😌
 (setq erc-server "irc.libera.chat"
       erc-nick "cowboy8625"
+      erc-port "6667"
       erc-user-full-nme "cowboy8625"
       erc-track-shorten-start 8
-      erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs"))
+      erc-autojoin-channels-alist '(("libera\\.chat" "#systemcrafters" "#emacs" "##rust"))
+      erc-hide-list '("JOIN" "PART" "QUIT")
       erc-kill-buffer-on-part t
       erc-auto-query 'bury)
+(erc)
 #+end_src
 
 * COMPANY
