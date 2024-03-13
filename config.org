@@ -931,6 +931,9 @@ The following settings are simple modes that are enabled (or disabled) so that E
 (setq ring-bell-function 'ignore) ; Turn off the annoying ringing when a key press is not valid
 (setq backup-directory-alist
   '(("." . "/tmp/"))) ;; stops trashing up the place like annoying friend with no respect
+(global-hl-line-mode 1)
+(custom-set-faces
+ '(hl-line ((t (:background "#1a1d21")))))
 #+end_src
 
 * SHELLS AND TERMINALS
