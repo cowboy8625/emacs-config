@@ -36,6 +36,7 @@
   - [[#go-languge][GO Languge]]
   - [[#typescript-language][TypeScript Language]]
 - [[#minibuffer-escape][MINIBUFFER ESCAPE]]
+- [[#markdown][MARKDOWN]]
 - [[#modeline][MODELINE]]
 - [[#neotree][NEOTREE]]
 - [[#orderless][ORDERLESS]]
@@ -117,11 +118,15 @@ By default, Emacs creates automatic backups of files in their original directori
       erc-port "6667"
       erc-user-full-nme "cowboy8625"
       erc-track-shorten-start 8
-      erc-autojoin-channels-alist '(("libera\\.chat" "#systemcrafters" "#emacs" "##rust"))
+      erc-autojoin-channels-alist '((
+        "libera\\.chat"
+        "#dailycodex"
+        "#systemcrafters"
+        "#emacs"
+        "rust"))
       erc-hide-list '("JOIN" "PART" "QUIT")
       erc-kill-buffer-on-part t
       erc-auto-query 'bury)
-(erc)
 #+end_src
 
 * COMPANY
@@ -740,6 +745,19 @@ By default, Emacs requires you to hit ESC three times to escape quit the minibuf
 (global-set-key [escape] 'keyboard-escape-quit)
 #+end_src
 
+* MARKDOWN
+#+begin_src emacs-lisp
+(use-package markdown-preview-mode
+  :ensure t
+  :commands (markdown-preview-mode)
+  :init
+  (setq markdown-preview-stylesheets
+        ;; '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
+        '("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-dark.min.css"))
+  :config
+  (add-hook 'markdown-mode-hook 'markdown-preview-mode))
+
+#+end_src
 * MODELINE
 The modeline is the bottom status bar that appears in Emacs windows.  While you can create your own custom modeline, why go to the trouble when Doom Emacs already has a nice modeline package available.  For more information on what is available to configure in the Doom modeline, check out: [[https://github.com/seagle0128/doom-modeline][Doom Modeline]]
 
@@ -929,12 +947,11 @@ The following settings are simple modes that are enabled (or disabled) so that E
 (setq scroll-step 1 scroll-conservatively 10000) ;; Smooth scrolling
 (setq org-edit-src-content-indentation 0) ;; Set src block automatic indent to 0 instead of 2.
 (setq ring-bell-function 'ignore) ; Turn off the annoying ringing when a key press is not valid
-(setq backup-directory-alist
-  '(("." . "/tmp/"))) ;; stops trashing up the place like annoying friend with no respect
 (global-hl-line-mode 1)
 (custom-set-faces
  '(hl-line ((t (:background "#1a1d21")))))
 #+end_src
+
 
 * SHELLS AND TERMINALS
 In my configs, all of my shells (bash, fish, zsh and the ESHELL) require my shell-color-scripts-git package to be installed.  On Arch Linux, you can install it from the AUR.  Otherwise, go to my shell-color-scripts repository on GitLab to get it.

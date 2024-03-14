@@ -1,3 +1,13 @@
+;;;; package --- Summary this cowboys init.el entry config
+;;; Commentary:
+;; This is cowboy8625 init.el entry config file
+
+;;; Code:
+
+;; This keeps Emacs to not make backups trashing up my projects
+;; even if the org config doesn't conmpile
+(setq backup-inhibited 1)
+
 (org-babel-load-file
  (expand-file-name
   "config.org"
