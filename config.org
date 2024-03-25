@@ -1,3 +1,4 @@
+
 #+TITLE: Cowboy's GNU Emacs Config
 #+AUTHOR: Cowboy8625
 #+DESCRIPTION: Cowboy's personal Emacs config.
@@ -32,6 +33,7 @@
 - [[#highlight-todo][HIGHLIGHT TODO]]
 - [[#ivy-counsel][IVY (COUNSEL)]]
 - [[#language-support][LANGUAGE SUPPORT]]
+  - [[#lisp][Lisp]]
   - [[#rust-language][Rust Language]]
   - [[#go-languge][GO Languge]]
   - [[#typescript-language][TypeScript Language]]
@@ -46,6 +48,7 @@
   - [[#diminish-org-indent-mode][Diminish Org Indent Mode]]
   - [[#org-level-headers][Org Level Headers]]
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
+  - [[#language-support-1][Language Support]]
 - [[#perspective][PERSPECTIVE]]
 - [[#projectile][PROJECTILE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
@@ -55,6 +58,7 @@
   - [[#eshell][Eshell]]
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm-Toggle]]
+- [[#slime][SLIME]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#theme][THEME]]
 - [[#tldr][TLDR]]
@@ -111,22 +115,25 @@ By default, Emacs creates automatic backups of files in their original directori
 ** IRC
 #+begin_src emacs-lisp
 
-;; You can put your credentials in a .authinfo file and it can use those. You can also gpg encrypt it (as .authinfo.gpg).
-;; * mretka is working with Java today and is grateful that asdf exists 😌
+					; (let ((erc-sasl-auth-source-function #'erc-auth-source-search))
+; .authinfo
 (setq erc-server "irc.libera.chat"
-      erc-nick "cowboy8625"
-      erc-port "6667"
-      erc-user-full-nme "cowboy8625"
-      erc-track-shorten-start 8
-      erc-autojoin-channels-alist '((
-        "libera\\.chat"
-        "#dailycodex"
-        "#systemcrafters"
-        "#emacs"
-        "rust"))
-      erc-hide-list '("JOIN" "PART" "QUIT")
-      erc-kill-buffer-on-part t
-      erc-auto-query 'bury)
+    erc-nick "cowboy8625"
+    erc-port "6667"
+    erc-user-full-nme "cowboy8625"
+    erc-track-shorten-start 8
+    erc-autojoin-channels-alist '((
+    "libera\\.chat"
+    "#dailycodex"
+    "#llvm"
+    "#lisp"
+    "#neovim"
+    "#systemcrafters"
+    "#emacs"
+    "rust"))
+erc-hide-list '("JOIN" "PART" "QUIT")
+erc-kill-buffer-on-part t
+erc-auto-query 'bury)
 #+end_src
 
 * COMPANY
@@ -549,6 +556,9 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
     "w J" '(buf-move-down :wk "Buffer move down")
     "w K" '(buf-move-up :wk "Buffer move up")
     "w L" '(buf-move-right :wk "Buffer move right"))
+    ;; Saving Window Layout State
+    "w r" '(window-configuration-to-register :wk "Save window to [KEY] buffer")
+    "w w" '(register-read-with-preview :wk "Load window to [KEY] buffer")
 )
 #+end_src
 
@@ -684,7 +694,10 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+end_src
-
+** Lisp
+#+begin_src emacs-lisp
+; (use-package sly :ensure t)
+#+end_src
 ** Rust Language
 #+begin_src emacs-lisp
 (use-package flycheck-rust)
@@ -848,6 +861,12 @@ Removes "Ind" from showing in the modeline.
    '(org-level-7 ((t (:inherit outline-5 :height 1.1)))))
 #+end_src
 
+# ** Org Roam
+# #+begin_src emacs-lisp
+# (use-package org-roam
+#     :ensure t)
+# #+end_src
+
 ** Source Code Block Tag Expansion
 Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
@@ -866,6 +885,13 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 
 #+begin_src emacs-lisp
 (require 'org-tempo)
+#+end_src
+
+** Language Support
+#+begin_src emacs-lisp
+(use-package rustic
+  :custom
+  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 #+end_src
 
 * PERSPECTIVE
@@ -1021,6 +1047,12 @@ Vterm is a terminal emulator within Emacs.  The 'shell-file-name' setting sets t
                   ;;(dedicated . t) ;dedicated is supported in emacs27
                   (reusable-frames . visible)
                   (window-height . 0.4))))
+#+end_src
+
+* SLIME
+#+begin_src emacs-lisp
+(use-package sly :ensure t)
+(setq inferior-lisp-program "sbcl")
 #+end_src
 
 * SUDO EDIT

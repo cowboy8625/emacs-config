@@ -11,6 +11,7 @@ config.el
 elpa
 elpaca
 eshell
+games
 projectile-bookmarks.eld
 recentf
 sessions
