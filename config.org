@@ -696,7 +696,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+end_src
 ** Lisp
 #+begin_src emacs-lisp
-; (use-package sly :ensure t)
+(use-package sly :ensure t)
 #+end_src
 ** Rust Language
 #+begin_src emacs-lisp
