@@ -35,6 +35,7 @@
 - [[#language-support][LANGUAGE SUPPORT]]
   - [[#lisp][Lisp]]
   - [[#rust-language][Rust Language]]
+  - [[#zig-language][Zig Language]]
   - [[#go-languge][GO Languge]]
   - [[#typescript-language][TypeScript Language]]
 - [[#minibuffer-escape][MINIBUFFER ESCAPE]]
@@ -60,6 +61,7 @@
   - [[#vterm-toggle][Vterm-Toggle]]
 - [[#slime][SLIME]]
 - [[#sudo-edit][SUDO EDIT]]
+- [[#swiper][SWIPER]]
 - [[#theme][THEME]]
 - [[#tldr][TLDR]]
 - [[#transparency][TRANSPARENCY]]
@@ -67,6 +69,7 @@
 - [[#window-management][WINDOW MANAGEMENT]]
   - [[#exwm][EXWM]]
 - [[#codeium][Codeium]]
+- [[#scripts][Scripts]]
 
 * TODO
 ** [[[[https://github.com/minad/consult]]][like telescope]]
@@ -130,7 +133,9 @@ By default, Emacs creates automatic backups of files in their original directori
     "#neovim"
     "#systemcrafters"
     "#emacs"
-    "rust"))
+    "#zig"
+    "#nyxt"
+    "##rust"))
 erc-hide-list '("JOIN" "PART" "QUIT")
 erc-kill-buffer-on-part t
 erc-auto-query 'bury)
@@ -310,15 +315,15 @@ Defining the various fonts that Emacs will use.
 ** Setting the Font Face
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
-  :font "JetBrains Mono"
+  :font "JetBrains Mono Nerd Font"
   :height 110
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil
-  :font "Ubuntu"
+  :font "JetBrains Mono Nerd Font"
   :height 120
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-  :font "JetBrains Mono"
+  :font "JetBrains Mono Nerd Font"
   :height 110
   :weight 'medium)
 ;; Makes commented text and keywords italics.
@@ -332,7 +337,7 @@ Defining the various fonts that Emacs will use.
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "JetBrains Mono-11"))
+(add-to-list 'default-frame-alist '(font . "JetBrains Mono Nerd Font"))
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
@@ -358,7 +363,8 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
   (general-define-key
     :states '(normal visual insert emacs)
     :keymaps 'override
-    "C-n" '(neotree-toggle :wk "Toggle neotree file viewer"))
+    "C-n" '(neotree-toggle :wk "Toggle neotree file viewer")
+    "C-/" '(vterm-toggle :wk "Toggle vterm"))
 
   ;; set up 'SPC' as the global leader key
   (general-create-definer cw/leader-keys
@@ -371,7 +377,6 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
     "SPC" '(counsel-M-x :wk "Counsel M-x")
     "." '(find-file :wk "Find file")
     "=" '(perspective-map :wk "Perspective") ;; Lists all the perspective keybindings
-    "TAB TAB" '(comment-line :wk "Comment lines")
     "u" '(universal-argument :wk "Universal argument"))
 
   (cw/leader-keys
@@ -392,6 +397,10 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
     "b s" '(basic-save-buffer :wk "Save buffer")
     "b S" '(save-some-buffers :wk "Save multiple buffers")
     "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+
+  (cw/leader-keys
+    "c" '(:ignore t :wk "Comment")
+    "c c" '(comment-line :wk "Comment lines"))
 
   (cw/leader-keys
     "d" '(:ignore t :wk "Dired")
@@ -517,13 +526,18 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
   ;; set for us, so no need to specify each individually.
   (cw/leader-keys
     "p" '(projectile-command-map :wk "Projectile"))
+  
+  (cw/leader-keys
+    "r" '(:ignore t :wk "Run")
+    "r t" '(run-rust-test-under-cursor :wk "Test"))
 
   (cw/leader-keys
     "s" '(:ignore t :wk "Search")
     "s d" '(dictionary-search :wk "Search dictionary")
     "s m" '(man :wk "Man pages")
     "s t" '(tldr :wk "Lookup TLDR docs for a command")
-    "s w" '(woman :wk "Similar to man but doesn't require man"))
+    "s w" '(woman :wk "Similar to man but doesn't require man")
+    "s g" '(swiper :wk "Swiper"))
 
   (cw/leader-keys
     "t"   '(:ignore t :wk "Toggle")
@@ -632,14 +646,13 @@ Adding highlights to TODO and related words.
 
 (use-package ivy
   :bind
-  ;; ivy-resume resumes the last Ivy-based completion.
   (("C-c C-r" . ivy-resume)
    ("C-x B" . ivy-switch-buffer-other-window))
   :diminish
   :custom
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq enable-recursive-minibuffers t)
+  (ivy-use-virtual-buffers t)
+  (ivy-count-format "(%d/%d) ")
+  (enable-recursive-minibuffers t)
   :config
   (ivy-mode))
 
@@ -704,6 +717,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 (add-hook 'rust-ts-mode-hook 'lsp)
 (with-eval-after-load 'rust-mode
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
 ;; (dap-register-debug-template "Rust::GDB Run Configuration"
 ;;                              (list :type "gdb"
 ;;                                    :request "launch"
@@ -712,8 +726,27 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 ;;                                    :target nil
 ;;                                    :cwd nil))
 
-#+end_src
+(defun get-identifier-under-cursor ()
+  "Get the identifier (symbol) under the cursor and display it in the minibuffer."
+  (interactive)
+  (let ((identifier (thing-at-point 'symbol t)))
+    (if identifier
+        (message "Identifier under cursor: %s" identifier)
+      (message "No identifier found under cursor"))))
 
+(defun run-rust-test-under-cursor ()
+  "Run the Rust test under the cursor using `cargo test`."
+  (interactive)
+  (let ((test-name (thing-at-point 'symbol t)))
+    (if test-name
+        (compile (format "cargo test %s" test-name))
+      (message "No test name found under cursor"))))
+
+#+end_src
+** Zig Language
+#+begin_src emacs-lisp
+(use-package zig-mode)
+#+end_src
 ** GO Languge
 # #+begin_src emacs-lisp
 
@@ -1062,6 +1095,11 @@ Vterm is a terminal emulator within Emacs.  The 'shell-file-name' setting sets t
 (use-package sudo-edit)
 #+end_src
 
+* SWIPER
+#+begin_src emacs-lisp
+(use-package swaper)
+#+end_src
+
 * THEME
 The first line below designates the directory where will place all of our custom-made themes.  You can create your own Emacs themes with the help of the [[https://emacsfodder.github.io/emacs-theme-editor/][Emacs Theme Editor]].  I am also installing =doom-themes= because it contains a huge collection of themes.  M-x load-theme will list all of the themes available.
 
@@ -1091,7 +1129,7 @@ The first line below designates the directory where will place all of our custom
 With Emacs version 29, true transparency has been added.  I have turned transparency off by setting the alpha to '100'.  If you want some slight transparency, try setting alpha to '90'.  Of course, if you set alpha to '0', the background of Emacs would completely transparent.
 
 #+begin_src emacs-lisp
-(add-to-list 'default-frame-alist '(alpha-background . 80)) ; For all new frames henceforth
+(add-to-list 'default-frame-alist '(alpha-background . 100)) ; For all new frames henceforth
 #+end_src
 
 * WHICH-KEY
@@ -1203,3 +1241,45 @@ With Emacs version 29, true transparency has been added.  I have turned transpar
 #   (setq codeium/document/text 'my-codeium/document/text)
 #   (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
 # #+end_src
+
+* Scripts
+#+begin_src emacs-lisp
+(defun toggle-mode-line ()
+  "Toggle the mode line in all buffers."
+  (interactive)
+  (if (eq (default-value 'mode-line-format) nil)
+      ;; Restore the mode line
+      (progn
+        (setq-default mode-line-format (default-value 'mode-line-format-original))
+        (walk-windows (lambda (window)
+                        (with-current-buffer (window-buffer window)
+                          (setq mode-line-format (default-value 'mode-line-format-original))))))
+    ;; Hide the mode line
+    (progn
+      ;; Save the original mode line format if it's the first time toggling
+      (unless (boundp 'mode-line-format-original)
+        (setq-default mode-line-format-original (default-value 'mode-line-format)))
+      (setq-default mode-line-format nil)
+      (walk-windows (lambda (window)
+                      (with-current-buffer (window-buffer window)
+                        (setq mode-line-format nil))))))
+  (redraw-display))
+
+(defun toggle-line-numbers ()
+  "Toggle line numbers in all buffers."
+  (interactive)
+  (if (bound-and-true-p display-line-numbers)
+      (setq-default display-line-numbers nil)
+    (setq-default display-line-numbers t))
+  (global-display-line-numbers-mode 'toggle))
+
+(defun toggle-focus-mode ()
+  "Toggle line numbers and mode line in all buffers."
+  (interactive)
+  (toggle-line-numbers)
+  (toggle-mode-line))
+
+(defun zen-mode ()
+  (interactive)
+  (toggle-focus-mode))
+#+end_src
